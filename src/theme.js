@@ -2,37 +2,37 @@ import { createTheme, alpha } from "@mui/material/styles";
 
 export const pumpGoTheme = createTheme({
   palette: {
-    mode: "dark",
+    mode: "light",
     primary: {
-      main: "#5B8DFF",
-      light: "#8EB0FF",
-      dark: "#3D6AE0",
-      contrastText: "#0B1020",
+      main: "#2563EB",
+      light: "#60A5FA",
+      dark: "#1D4ED8",
+      contrastText: "#ffffff",
     },
     secondary: {
-      main: "#2DD4BF",
-      light: "#5EEAD4",
-      dark: "#14B8A6",
-      contrastText: "#041016",
+      main: "#0D9488",
+      light: "#2DD4BF",
+      dark: "#0F766E",
+      contrastText: "#ffffff",
     },
     warning: {
-      main: "#F5C451",
-      contrastText: "#1A1204",
+      main: "#D97706",
+      contrastText: "#ffffff",
     },
     background: {
-      default: "#070B14",
-      paper: "#101A2E",
+      default: "#ffffff",
+      paper: "#ffffff",
     },
     text: {
-      primary: "#F4F7FF",
-      secondary: "rgba(228, 236, 255, 0.78)",
-      disabled: "rgba(228, 236, 255, 0.45)",
+      primary: "#0f172a",
+      secondary: "rgba(15, 23, 42, 0.68)",
+      disabled: "rgba(15, 23, 42, 0.38)",
     },
-    divider: "rgba(255, 255, 255, 0.1)",
+    divider: "rgba(15, 23, 42, 0.12)",
     action: {
-      active: "rgba(255, 255, 255, 0.9)",
-      hover: "rgba(255, 255, 255, 0.08)",
-      selected: alpha("#5B8DFF", 0.18),
+      active: "rgba(15, 23, 42, 0.9)",
+      hover: "rgba(15, 23, 42, 0.06)",
+      selected: alpha("#2563EB", 0.12),
     },
   },
   typography: {
@@ -52,7 +52,7 @@ export const pumpGoTheme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: "#070B14",
+          backgroundColor: "#ffffff",
         },
       },
     },
@@ -66,9 +66,10 @@ export const pumpGoTheme = createTheme({
     MuiDialog: {
       styleOverrides: {
         paper: {
-          backgroundImage: `linear-gradient(165deg, ${alpha("#162544", 0.98)} 0%, ${alpha("#0D1528", 0.99)} 100%)`,
-          border: `1px solid ${alpha("#5B8DFF", 0.2)}`,
-          boxShadow: `0 24px 48px ${alpha("#000", 0.45)}`,
+          backgroundImage: "none",
+          backgroundColor: "#ffffff",
+          border: `1px solid ${alpha("#2563EB", 0.2)}`,
+          boxShadow: `0 24px 48px ${alpha("#0f172a", 0.12)}`,
         },
       },
     },
@@ -78,19 +79,19 @@ export const pumpGoTheme = createTheme({
           borderRadius: 12,
         },
         containedPrimary: {
-          background: "linear-gradient(135deg, #6B9FFF 0%, #4A7AE8 55%, #3D6AE0 100%)",
-          boxShadow: `0 8px 24px ${alpha("#5B8DFF", 0.35)}`,
+          background: "linear-gradient(135deg, #3B82F6 0%, #2563EB 55%, #1D4ED8 100%)",
+          boxShadow: `0 4px 14px ${alpha("#2563EB", 0.35)}`,
           "&:hover": {
-            background: "linear-gradient(135deg, #7BA6FF 0%, #5284F0 100%)",
-            boxShadow: `0 10px 28px ${alpha("#5B8DFF", 0.45)}`,
+            background: "linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)",
+            boxShadow: `0 6px 20px ${alpha("#2563EB", 0.4)}`,
           },
         },
         outlined: {
-          borderColor: alpha("#fff", 0.22),
-          color: "#F4F7FF",
+          borderColor: alpha("#0f172a", 0.2),
+          color: "#0f172a",
           "&:hover": {
-            borderColor: alpha("#5B8DFF", 0.55),
-            backgroundColor: alpha("#5B8DFF", 0.08),
+            borderColor: alpha("#2563EB", 0.55),
+            backgroundColor: alpha("#2563EB", 0.06),
           },
         },
       },
