@@ -329,6 +329,13 @@
       clearNotice();
     }
 
+    function hasGrantedPermission(OneSignal) {
+      const browserGranted = typeof Notification !== "undefined" && Notification.permission === "granted";
+      const osPerm = OneSignal?.Notifications?.permission;
+      const osGranted = osPerm === true || osPerm === "granted";
+      return browserGranted || osGranted;
+    }
+
     checkSetupFromUrl();
 
     window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -416,7 +423,7 @@
       }
 
       OneSignal.Notifications.addEventListener("permissionChange", async function (granted) {
-        if (!(granted === true || granted === "granted")) return;
+        if (!(granted === true || granted === "granted" || Notification.permission === "granted")) return;
         try {
           await finalizeSubscriptionSuccess();
         } catch (err) {
@@ -441,13 +448,13 @@
         setLoading(true);
         try {
           await OneSignal.login(userId);
-          if (OneSignal.Notifications.permission === true || OneSignal.Notifications.permission === "granted") {
+          if (hasGrantedPermission(OneSignal)) {
             await finalizeSubscriptionSuccess();
             return;
           }
 
           await OneSignal.Notifications.requestPermission();
-          if (OneSignal.Notifications.permission === true || OneSignal.Notifications.permission === "granted") {
+          if (hasGrantedPermission(OneSignal)) {
             await finalizeSubscriptionSuccess();
             return;
           }
