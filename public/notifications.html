@@ -381,8 +381,29 @@
         });
       }
 
+      async function resolveSubscriptionId() {
+        const immediate = OneSignal.User.PushSubscription.id;
+        if (immediate) return immediate;
+
+        try {
+          const waited = await waitForSubscriptionId(12000);
+          if (waited) return waited;
+        } catch (_) {
+          // fall through to timed polling fallback
+        }
+
+        // Some browsers populate subscription id slightly after permission grant.
+        const maxAttempts = 12;
+        for (let i = 0; i < maxAttempts; i += 1) {
+          await new Promise((r) => setTimeout(r, 500));
+          const id = OneSignal.User.PushSubscription.id;
+          if (id) return id;
+        }
+        return null;
+      }
+
       async function finalizeSubscriptionSuccess() {
-        const playerId = OneSignal.User.PushSubscription.id || await waitForSubscriptionId(20000);
+        const playerId = await resolveSubscriptionId();
         if (!playerId) {
           setNotice("error", "Notifications weren’t fully enabled. Tap again and choose Allow when prompted.");
           return false;
