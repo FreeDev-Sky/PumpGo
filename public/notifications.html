@@ -457,12 +457,6 @@
 
     checkSetupFromUrl();
 
-    // If browser permission is already granted from a previous visit,
-    // disable the CTA immediately so users don't re-run setup unnecessarily.
-    if (typeof Notification !== "undefined" && Notification.permission === "granted") {
-      markButtonEnabledState();
-    }
-
     btn.addEventListener("click", async () => {
       clearNotice();
       const userId = getUserIdFromUrl();
