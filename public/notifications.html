@@ -296,6 +296,10 @@
     const noticeEl = document.getElementById("notice");
     const btn = document.getElementById("subscribe-btn");
 
+    let oneSignalInitPromise = null;
+    let permissionListenerAttached = false;
+    let externalIdLinked = false;
+
     function getUserIdFromUrl() {
       const raw = new URLSearchParams(location.search).get("user_id");
       if (raw == null || String(raw).trim() === "") return null;
@@ -336,138 +340,154 @@
       return browserGranted || osGranted;
     }
 
-    checkSetupFromUrl();
+    async function ensureOneSignalInitialized() {
+      if (oneSignalInitPromise) return oneSignalInitPromise;
 
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    OneSignalDeferred.push(async function (OneSignal) {
-      let externalIdLinked = false;
-      const isLocal =
-        location.hostname === "localhost" ||
-        location.hostname === "127.0.0.1";
-
-      await OneSignal.init({
-        appId: ONESIGNAL_APP_ID,
-        serviceWorkerPath: "OneSignalSDKWorker.js",
-        autoResubscribe: true,
-        allowLocalhostAsSecureOrigin: isLocal
-      });
-
-      function waitForSubscriptionId(timeoutMs) {
-        return new Promise((resolve, reject) => {
-          const existing = OneSignal.User.PushSubscription.id;
-          if (existing) {
-            resolve(existing);
-            return;
-          }
-          const timer = setTimeout(() => {
-            const lateId = OneSignal.User.PushSubscription.id;
-            if (lateId) {
-              OneSignal.User.PushSubscription.removeEventListener("change", onChange);
-              resolve(lateId);
-              return;
-            }
-            OneSignal.User.PushSubscription.removeEventListener("change", onChange);
-            reject(new Error("We couldn’t finish linking this device. Allow notifications and try again, or check that this site’s URL is allowed in your OneSignal dashboard."));
-          }, timeoutMs);
-          function onChange(event) {
-            if (event.current && event.current.id) {
-              clearTimeout(timer);
-              OneSignal.User.PushSubscription.removeEventListener("change", onChange);
-              resolve(event.current.id);
-            }
-          }
-          OneSignal.User.PushSubscription.addEventListener("change", onChange);
-        });
-      }
-
-      async function resolveSubscriptionId() {
-        const immediate = OneSignal.User.PushSubscription.id;
-        if (immediate) return immediate;
-
-        try {
-          const waited = await waitForSubscriptionId(12000);
-          if (waited) return waited;
-        } catch (_) {
-          // fall through to timed polling fallback
-        }
-
-        // Some browsers populate subscription id slightly after permission grant.
-        const maxAttempts = 12;
-        for (let i = 0; i < maxAttempts; i += 1) {
-          await new Promise((r) => setTimeout(r, 500));
-          const id = OneSignal.User.PushSubscription.id;
-          if (id) return id;
-        }
-        return null;
-      }
-
-      async function finalizeSubscriptionSuccess() {
-        const playerId = await resolveSubscriptionId();
-        if (!playerId) {
-          setNotice("error", "Notifications weren’t fully enabled. Tap again and choose Allow when prompted.");
-          return false;
-        }
-
-        // Link external id only after the browser has a real push subscription.
-        const externalId = getUserIdFromUrl();
-        if (externalId && !externalIdLinked) {
+      oneSignalInitPromise = new Promise((resolve, reject) => {
+        window.OneSignalDeferred = window.OneSignalDeferred || [];
+        window.OneSignalDeferred.push(async function (OneSignal) {
           try {
-            await OneSignal.login(externalId);
-            externalIdLinked = true;
-          } catch (e) {
-            console.warn("OneSignal.login (user_id from URL)", e);
+            const isLocal =
+              location.hostname === "localhost" ||
+              location.hostname === "127.0.0.1";
+
+            await OneSignal.init({
+              appId: ONESIGNAL_APP_ID,
+              serviceWorkerPath: "OneSignalSDKWorker.js",
+              autoResubscribe: true,
+              allowLocalhostAsSecureOrigin: isLocal
+            });
+
+            if (!permissionListenerAttached) {
+              permissionListenerAttached = true;
+              OneSignal.Notifications.addEventListener("permissionChange", async function (granted) {
+                if (!(granted === true || granted === "granted" || Notification.permission === "granted")) return;
+                try {
+                  await finalizeSubscriptionSuccess(OneSignal);
+                } catch (err) {
+                  console.error(err);
+                }
+              });
+            }
+
+            resolve(OneSignal);
+          } catch (err) {
+            reject(err);
           }
-        }
-
-        setNotice("ok", "You’re all set. We’ll notify this device when your order is ready.");
-        btn.querySelector(".cta-label").textContent = "Notifications on";
-        btn.disabled = true;
-        return true;
-      }
-
-      OneSignal.Notifications.addEventListener("permissionChange", async function (granted) {
-        if (!(granted === true || granted === "granted" || Notification.permission === "granted")) return;
-        try {
-          await finalizeSubscriptionSuccess();
-        } catch (err) {
-          console.error(err);
-        }
+        });
       });
 
-      btn.addEventListener("click", async () => {
-        clearNotice();
-        const userId = getUserIdFromUrl();
+      return oneSignalInitPromise;
+    }
 
-        if (!userId) {
-          setNotice("warn", "Missing user id in the link. Open this page from Glide with ?user_id=… so we know who to notify.");
+    function waitForSubscriptionId(OneSignal, timeoutMs) {
+      return new Promise((resolve, reject) => {
+        const existing = OneSignal.User.PushSubscription.id;
+        if (existing) {
+          resolve(existing);
           return;
         }
+        const timer = setTimeout(() => {
+          const lateId = OneSignal.User.PushSubscription.id;
+          if (lateId) {
+            OneSignal.User.PushSubscription.removeEventListener("change", onChange);
+            resolve(lateId);
+            return;
+          }
+          OneSignal.User.PushSubscription.removeEventListener("change", onChange);
+          reject(new Error("We couldn’t finish linking this device. Allow notifications and try again, or check that this site’s URL is allowed in your OneSignal dashboard."));
+        }, timeoutMs);
+        function onChange(event) {
+          if (event.current && event.current.id) {
+            clearTimeout(timer);
+            OneSignal.User.PushSubscription.removeEventListener("change", onChange);
+            resolve(event.current.id);
+          }
+        }
+        OneSignal.User.PushSubscription.addEventListener("change", onChange);
+      });
+    }
+
+    async function resolveSubscriptionId(OneSignal) {
+      const immediate = OneSignal.User.PushSubscription.id;
+      if (immediate) return immediate;
+
+      try {
+        const waited = await waitForSubscriptionId(OneSignal, 12000);
+        if (waited) return waited;
+      } catch (_) {
+        // fall through to timed polling fallback
+      }
+
+      const maxAttempts = 12;
+      for (let i = 0; i < maxAttempts; i += 1) {
+        await new Promise((r) => setTimeout(r, 500));
+        const id = OneSignal.User.PushSubscription.id;
+        if (id) return id;
+      }
+      return null;
+    }
+
+    async function finalizeSubscriptionSuccess(OneSignal) {
+      const playerId = await resolveSubscriptionId(OneSignal);
+      if (!playerId) {
+        setNotice("error", "Notifications weren’t fully enabled. Tap again and choose Allow when prompted.");
+        return false;
+      }
+
+      const externalId = getUserIdFromUrl();
+      if (externalId && !externalIdLinked) {
+        try {
+          await OneSignal.login(externalId);
+          externalIdLinked = true;
+        } catch (e) {
+          console.warn("OneSignal.login (user_id from URL)", e);
+        }
+      }
+
+      setNotice("ok", "You’re all set. We’ll notify this device when your order is ready.");
+      btn.querySelector(".cta-label").textContent = "Notifications on";
+      btn.disabled = true;
+      return true;
+    }
+
+    checkSetupFromUrl();
+
+    btn.addEventListener("click", async () => {
+      clearNotice();
+      const userId = getUserIdFromUrl();
+
+      if (!userId) {
+        setNotice("warn", "Missing user id in the link. Open this page from Glide with ?user_id=… so we know who to notify.");
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const OneSignal = await ensureOneSignalInitialized();
 
         if (!OneSignal.Notifications.isPushSupported()) {
           setNotice("error", "This browser can’t use web push. Try Chrome, Edge, or Safari in a normal tab—not an in-app browser.");
           return;
         }
 
-        setLoading(true);
-        try {
-          if (hasGrantedPermission(OneSignal)) {
-            await finalizeSubscriptionSuccess();
-            return;
-          }
-
-          await OneSignal.Notifications.requestPermission();
-          if (hasGrantedPermission(OneSignal)) {
-            await finalizeSubscriptionSuccess();
-            return;
-          }
-          setNotice("warn", "Notifications are still blocked. Choose Allow in the browser prompt or site settings, then try again.");
-        } catch (err) {
-          console.error(err);
-          setNotice("error", err && err.message ? err.message : "Something went wrong. Please try again.");
-        } finally {
-          setLoading(false);
+        if (hasGrantedPermission(OneSignal)) {
+          await finalizeSubscriptionSuccess(OneSignal);
+          return;
         }
-      });
+
+        await OneSignal.Notifications.requestPermission();
+        if (hasGrantedPermission(OneSignal)) {
+          await finalizeSubscriptionSuccess(OneSignal);
+          return;
+        }
+        setNotice("warn", "Notifications are still blocked. Choose Allow in the browser prompt or site settings, then try again.");
+      } catch (err) {
+        console.error(err);
+        setNotice("error", err && err.message ? err.message : "Something went wrong. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     });
   </script>
 
