@@ -324,6 +324,11 @@
       btn.classList.toggle("is-loading", loading);
     }
 
+    function markButtonEnabledState() {
+      btn.querySelector(".cta-label").textContent = "Notifications on";
+      btn.disabled = true;
+    }
+
     function checkSetupFromUrl() {
       const userId = getUserIdFromUrl();
       if (!userId) {
@@ -446,12 +451,17 @@
       }
 
       setNotice("ok", "You’re all set. We’ll notify this device when your order is ready.");
-      btn.querySelector(".cta-label").textContent = "Notifications on";
-      btn.disabled = true;
+      markButtonEnabledState();
       return true;
     }
 
     checkSetupFromUrl();
+
+    // If browser permission is already granted from a previous visit,
+    // disable the CTA immediately so users don't re-run setup unnecessarily.
+    if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+      markButtonEnabledState();
+    }
 
     btn.addEventListener("click", async () => {
       clearNotice();
