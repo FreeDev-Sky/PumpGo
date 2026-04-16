@@ -12,12 +12,12 @@ const qrImageForUrl = (url) =>
   `https://api.qrserver.com/v1/create-qr-code/?size=520x520&data=${encodeURIComponent(url)}`;
 
 const categoryTiles = [
-  { key: "snacks", src: "/assets/categories/snacks.png", alt: "Snacks" },
-  { key: "tobacco", src: "/assets/categories/tobacco.png", alt: "Tobacco — ID required at pickup" },
-  { key: "kitchen", src: "/assets/categories/kitchen.png", alt: "Kitchen — fresh, made to order" },
-  { key: "drinks", src: "/assets/categories/drinks.png", alt: "Drinks" },
-  { key: "meds", src: "/assets/categories/meds.png", alt: "Meds — pain relief, cold and allergy" },
-  { key: "alcohol", src: "/assets/categories/alcohol.png", alt: "Alcohol — ID required at pickup" },
+  { id: "snacks", src: "/assets/categories/snacks.png", alt: "Snacks" },
+  { id: "tobacco", src: "/assets/categories/tobacco.png", alt: "Tobacco — ID required at pickup" },
+  { id: "kitchen", src: "/assets/categories/kitchen.png", alt: "Kitchen — fresh, made to order" },
+  { id: "drinks", src: "/assets/categories/drinks.png", alt: "Drinks" },
+  { id: "meds", src: "/assets/categories/meds.png", alt: "Meds — pain relief, cold and allergy" },
+  { id: "alcohol", src: "/assets/categories/alcohol.png", alt: "Alcohol — ID required at pickup" },
 ];
 
 function CategoryCard({ src, alt }) {
@@ -140,9 +140,9 @@ function App() {
         <Grid container spacing={2} sx={{ display: { xs: "none", md: "flex" }, width: "100%", m: 0, alignItems: "stretch" }}>
           <Grid size={3} sx={{ display: "flex", minWidth: 0 }}>
             <Stack spacing={2} sx={{ width: "100%", justifyContent: "space-between" }}>
-              <CategoryCard {...snacks} />
-              <CategoryCard {...tobacco} />
-              <CategoryCard {...kitchen} />
+              <CategoryCard src={snacks.src} alt={snacks.alt} />
+              <CategoryCard src={tobacco.src} alt={tobacco.alt} />
+              <CategoryCard src={kitchen.src} alt={kitchen.alt} />
             </Stack>
           </Grid>
           <Grid size={6} sx={{ display: "flex", alignItems: "center", justifyContent: "center", minWidth: 0 }}>
@@ -150,9 +150,9 @@ function App() {
           </Grid>
           <Grid size={3} sx={{ display: "flex", minWidth: 0 }}>
             <Stack spacing={2} sx={{ width: "100%", justifyContent: "space-between" }}>
-              <CategoryCard {...drinks} />
-              <CategoryCard {...meds} />
-              <CategoryCard {...alcohol} />
+              <CategoryCard src={drinks.src} alt={drinks.alt} />
+              <CategoryCard src={meds.src} alt={meds.alt} />
+              <CategoryCard src={alcohol.src} alt={alcohol.alt} />
             </Stack>
           </Grid>
         </Grid>
@@ -161,8 +161,8 @@ function App() {
         <Stack spacing={1.5} sx={{ display: { xs: "none", sm: "flex", md: "none" }, width: "100%", alignItems: "center" }}>
           <Grid container spacing={1.5} sx={{ width: "100%", m: 0 }}>
             {categoryTiles.map((c) => (
-              <Grid key={c.key} size={4} sx={{ minWidth: 0 }}>
-                <CategoryCard {...c} />
+              <Grid key={c.id} size={4} sx={{ minWidth: 0 }}>
+                <CategoryCard src={c.src} alt={c.alt} />
               </Grid>
             ))}
           </Grid>
@@ -174,8 +174,8 @@ function App() {
           <CustomerQrBlock />
           <Grid container spacing={1} sx={{ width: "100%", m: 0 }}>
             {categoryTiles.map((c) => (
-              <Grid key={c.key} size={6} sx={{ minWidth: 0 }}>
-                <CategoryCard {...c} />
+              <Grid key={c.id} size={6} sx={{ minWidth: 0 }}>
+                <CategoryCard src={c.src} alt={c.alt} />
               </Grid>
             ))}
           </Grid>
