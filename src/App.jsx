@@ -22,24 +22,7 @@ const categoryTiles = [
 
 function CategoryCard({ src, alt }) {
   return (
-    <Box
-      component="a"
-      href={PUMPGO_CUSTOMER_APP_URL}
-      target="_blank"
-      rel="noopener noreferrer"
-      sx={{
-        display: "block",
-        borderRadius: 2,
-        overflow: "hidden",
-        lineHeight: 0,
-        transition: "transform 0.2s ease, box-shadow 0.2s ease",
-        "&:hover": {
-          transform: "translateY(-2px)",
-          boxShadow: "0 8px 24px rgba(15, 23, 42, 0.12)",
-        },
-        "&:focus-visible": { outline: `3px solid ${alpha("#F5C451", 0.85)}`, outlineOffset: 2 },
-      }}
-    >
+    <Box sx={{ borderRadius: 2, overflow: "hidden", lineHeight: 0 }}>
       <Box component="img" src={src} alt={alt} sx={{ width: "100%", height: "auto", display: "block" }} />
     </Box>
   );
@@ -125,9 +108,9 @@ function App() {
           src={HEADER_LOGO_SRC}
           alt="PumpGo — Convenience at Full Speed"
           sx={{
-            height: { xs: 50, sm: 72, md: 84 },
+            height: { xs: 100, sm: 130, md: 160 },
             width: "auto",
-            maxWidth: { xs: "85%", sm: 420, md: 500 },
+            maxWidth: { xs: "100%", sm: 580, md: 700 },
             objectFit: "contain",
             display: "inline-block",
           }}
