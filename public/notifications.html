@@ -340,6 +340,7 @@
 
     window.OneSignalDeferred = window.OneSignalDeferred || [];
     OneSignalDeferred.push(async function (OneSignal) {
+      let externalIdLinked = false;
       const isLocal =
         location.hostname === "localhost" ||
         location.hostname === "127.0.0.1";
@@ -350,15 +351,6 @@
         autoResubscribe: true,
         allowLocalhostAsSecureOrigin: isLocal
       });
-
-      const externalId = getUserIdFromUrl();
-      if (externalId) {
-        try {
-          await OneSignal.login(externalId);
-        } catch (e) {
-          console.warn("OneSignal.login (user_id from URL)", e);
-        }
-      }
 
       function waitForSubscriptionId(timeoutMs) {
         return new Promise((resolve, reject) => {
@@ -416,6 +408,17 @@
           return false;
         }
 
+        // Link external id only after the browser has a real push subscription.
+        const externalId = getUserIdFromUrl();
+        if (externalId && !externalIdLinked) {
+          try {
+            await OneSignal.login(externalId);
+            externalIdLinked = true;
+          } catch (e) {
+            console.warn("OneSignal.login (user_id from URL)", e);
+          }
+        }
+
         setNotice("ok", "You’re all set. We’ll notify this device when your order is ready.");
         btn.querySelector(".cta-label").textContent = "Notifications on";
         btn.disabled = true;
@@ -447,7 +450,6 @@
 
         setLoading(true);
         try {
-          await OneSignal.login(userId);
           if (hasGrantedPermission(OneSignal)) {
             await finalizeSubscriptionSuccess();
             return;
