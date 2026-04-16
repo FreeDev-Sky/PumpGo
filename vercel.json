@@ -1,6 +1,7 @@
 {
   "routes": [
     { "handle": "filesystem" },
+    { "src": "^/notifications(?:/.*)?$", "dest": "/notifications.html" },
     { "src": "/.*", "dest": "/index.html" }
   ]
 }
