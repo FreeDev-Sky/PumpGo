@@ -50,25 +50,38 @@ export default function NotificationPage() {
       });
     }
 
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    window.OneSignalDeferred.push(async function (OneSignal) {
-      const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
-      await OneSignal.init({
-        appId: ONESIGNAL_APP_ID,
-        serviceWorkerPath: "OneSignalSDKWorker.js",
-        autoResubscribe: true,
-        allowLocalhostAsSecureOrigin: isLocal,
-      });
-      osRef.current = OneSignal;
+    function initOneSignal() {
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+      window.OneSignalDeferred.push(async function (OneSignal) {
+        const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+        await OneSignal.init({
+          appId: ONESIGNAL_APP_ID,
+          serviceWorkerPath: "/OneSignalSDKWorker.js",
+          serviceWorkerParam: { scope: "/" },
+          autoResubscribe: true,
+          allowLocalhostAsSecureOrigin: isLocal,
+        });
+        osRef.current = OneSignal;
 
-      if (userId) {
-        try {
-          await OneSignal.login(userId);
-        } catch (e) {
-          console.warn("OneSignal.login (user_id from URL)", e);
+        if (userId) {
+          try {
+            await OneSignal.login(userId);
+          } catch (e) {
+            console.warn("OneSignal.login (user_id from URL)", e);
+          }
         }
-      }
-    });
+      });
+    }
+
+    if (document.querySelector('script[src*="OneSignalSDK"]')) {
+      initOneSignal();
+    } else {
+      const script = document.createElement("script");
+      script.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
+      script.defer = true;
+      script.onload = initOneSignal;
+      document.head.appendChild(script);
+    }
   }, []);
 
   const handleSubscribe = useCallback(async () => {
