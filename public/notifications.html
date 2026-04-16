@@ -361,6 +361,12 @@
             return;
           }
           const timer = setTimeout(() => {
+            const lateId = OneSignal.User.PushSubscription.id;
+            if (lateId) {
+              OneSignal.User.PushSubscription.removeEventListener("change", onChange);
+              resolve(lateId);
+              return;
+            }
             OneSignal.User.PushSubscription.removeEventListener("change", onChange);
             reject(new Error("We couldn’t finish linking this device. Allow notifications and try again, or check that this site’s URL is allowed in your OneSignal dashboard."));
           }, timeoutMs);
@@ -374,6 +380,28 @@
           OneSignal.User.PushSubscription.addEventListener("change", onChange);
         });
       }
+
+      async function finalizeSubscriptionSuccess() {
+        const playerId = OneSignal.User.PushSubscription.id || await waitForSubscriptionId(20000);
+        if (!playerId) {
+          setNotice("error", "Notifications weren’t fully enabled. Tap again and choose Allow when prompted.");
+          return false;
+        }
+
+        setNotice("ok", "You’re all set. We’ll notify this device when your order is ready.");
+        btn.querySelector(".cta-label").textContent = "Notifications on";
+        btn.disabled = true;
+        return true;
+      }
+
+      OneSignal.Notifications.addEventListener("permissionChange", async function (granted) {
+        if (!(granted === true || granted === "granted")) return;
+        try {
+          await finalizeSubscriptionSuccess();
+        } catch (err) {
+          console.error(err);
+        }
+      });
 
       btn.addEventListener("click", async () => {
         clearNotice();
@@ -390,26 +418,24 @@
         }
 
         setLoading(true);
-        let subscribedOk = false;
         try {
           await OneSignal.login(userId);
-          await OneSignal.Notifications.requestPermission();
-
-          const playerId = await waitForSubscriptionId(20000);
-          if (!playerId) {
-            setNotice("error", "Notifications weren’t fully enabled. Tap again and choose Allow when prompted.");
+          if (OneSignal.Notifications.permission === true || OneSignal.Notifications.permission === "granted") {
+            await finalizeSubscriptionSuccess();
             return;
           }
 
-          subscribedOk = true;
-          setNotice("ok", "You’re all set. We’ll notify this device when your order is ready.");
-          btn.querySelector(".cta-label").textContent = "Notifications on";
+          await OneSignal.Notifications.requestPermission();
+          if (OneSignal.Notifications.permission === true || OneSignal.Notifications.permission === "granted") {
+            await finalizeSubscriptionSuccess();
+            return;
+          }
+          setNotice("warn", "Notifications are still blocked. Choose Allow in the browser prompt or site settings, then try again.");
         } catch (err) {
           console.error(err);
           setNotice("error", err && err.message ? err.message : "Something went wrong. Please try again.");
         } finally {
           setLoading(false);
-          if (subscribedOk) btn.disabled = true;
         }
       });
     });
