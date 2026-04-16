@@ -175,7 +175,7 @@ function App() {
         </Grid>
 
         {/* Tablet (sm–md): 2-col categories, QR below */}
-        <Stack spacing={1.5} sx={{ display: { xs: "none", sm: "flex", md: "none" }, width: "100%" }}>
+        <Stack spacing={1.5} sx={{ display: { xs: "none", sm: "flex", md: "none" }, width: "100%", alignItems: "center" }}>
           <Grid container spacing={1.5} sx={{ width: "100%", m: 0 }}>
             {categoryTiles.map((c) => (
               <Grid key={c.key} size={4} sx={{ minWidth: 0 }}>
@@ -187,7 +187,7 @@ function App() {
         </Stack>
 
         {/* Mobile (xs): QR first, then 2-col categories */}
-        <Stack spacing={1.5} sx={{ display: { xs: "flex", sm: "none" }, width: "100%" }}>
+        <Stack spacing={1.5} sx={{ display: { xs: "flex", sm: "none" }, width: "100%", alignItems: "center" }}>
           <CustomerQrBlock />
           <Grid container spacing={1} sx={{ width: "100%", m: 0 }}>
             {categoryTiles.map((c) => (
