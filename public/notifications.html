@@ -433,6 +433,26 @@
       return null;
     }
 
+    async function linkExternalId(OneSignal, externalId) {
+      if (!externalId) return;
+      try {
+        await OneSignal.login(externalId);
+      } catch (e) {
+        // Switching identities in the same browser can trigger 409 conflicts.
+        const message = String(e && (e.message || e));
+        if (message.includes("409") || message.toLowerCase().includes("conflict")) {
+          try {
+            await OneSignal.logout();
+            await OneSignal.login(externalId);
+          } catch (retryErr) {
+            throw retryErr;
+          }
+        } else {
+          throw e;
+        }
+      }
+    }
+
     async function finalizeSubscriptionSuccess(OneSignal) {
       const playerId = await resolveSubscriptionId(OneSignal);
       if (!playerId) {
@@ -443,10 +463,12 @@
       const externalId = getUserIdFromUrl();
       if (externalId && !externalIdLinked) {
         try {
-          await OneSignal.login(externalId);
+          await linkExternalId(OneSignal, externalId);
           externalIdLinked = true;
         } catch (e) {
           console.warn("OneSignal.login (user_id from URL)", e);
+          setNotice("warn", "Notification permission is enabled, but account linking had a conflict. Tap Enable once more to re-link this browser.");
+          return false;
         }
       }
 
