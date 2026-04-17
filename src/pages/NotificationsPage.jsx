@@ -142,8 +142,7 @@ function sleep(ms) {
 }
 
 /**
- * Re-subscribe after OneSignal opted the user out while the browser may still show permission "granted".
- * Retries optIn + wait once if the first wait times out without an id.
+ * Opt in and wait for a push subscription id (retries help after alerts were turned off or reset).
  */
 async function ensureActivePushSubscription(OneSignal) {
   await optInToPushIfAvailable(OneSignal);
@@ -163,14 +162,13 @@ async function ensureActivePushSubscription(OneSignal) {
 
 export default function NotificationsPage() {
   const [searchParams] = useSearchParams();
-  /** `user_id` from ?user_id=… (same as the old HTML page). */
+  /** Account id from the app link (?user_id=…). */
   const userId = (searchParams.get("user_id") ?? "").trim() || null;
 
   const [notice, setNotice] = useState({ severity: null, text: "" });
   const [loading, setLoading] = useState(false);
-  /** Last run linked push + external id; never blocks re-runs (user may need to heal OneSignal opt-out). */
   const [linkSuccess, setLinkSuccess] = useState(false);
-  /** Chrome (and others) penalize instant permission prompts; require an explicit intent tap first. */
+  /** Two-step flow: first tap shows you chose alerts; second tap asks the browser (better for phones and browsers). */
   const [intentReady, setIntentReady] = useState(false);
 
   useEffect(() => {
@@ -183,23 +181,49 @@ export default function NotificationsPage() {
     if (!userId) {
       setNotice({
         severity: "warning",
-        text: "This page needs ?user_id=… in the URL. Open it from your app or add your id after user_id=.",
+        text: "Open this page using the link from the PumpGo app. If you opened it another way, go back and use “Turn on notifications” (or similar) inside the app.",
       });
     } else if (typeof Notification !== "undefined" && Notification.permission === "granted") {
       setNotice({
         severity: "info",
-        text: "This site already has notification permission. If PumpGo shows you as unsubscribed, tap Continue then the green button to connect again.",
+        text: "This site is already allowed to send notifications. If alerts stopped working, tap Get started, then Turn on alerts again to refresh this device.",
       });
     } else {
       setNotice({ severity: null, text: "" });
     }
   }, [userId]);
 
+  useEffect(() => {
+    if (!navigator.permissions?.query) return undefined;
+    let status;
+    let cancelled = false;
+    const onPermChange = () => {
+      if (Notification.permission === "granted") {
+        setNotice({
+          severity: "info",
+          text: "Notifications are now allowed for this website. Tap Get started (if you haven’t), then Turn on alerts to finish.",
+        });
+      }
+    };
+    navigator.permissions
+      .query({ name: "notifications" })
+      .then((s) => {
+        if (cancelled) return;
+        status = s;
+        s.addEventListener("change", onPermChange);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+      if (status) status.removeEventListener("change", onPermChange);
+    };
+  }, []);
+
   const runSubscribe = useCallback(async () => {
     if (!intentReady) {
       setNotice({
         severity: "warning",
-        text: "Tap “Continue” first so Chrome knows you chose to set up alerts — then you can allow notifications.",
+        text: "Tap Get started first, then tap Turn on alerts.",
       });
       return;
     }
@@ -207,7 +231,7 @@ export default function NotificationsPage() {
     if (!userId) {
       setNotice({
         severity: "warning",
-        text: "Add your user id to the URL, for example: ?user_id=YOUR_ID (use the link from the app).",
+        text: "Use the notification link from the PumpGo app so we know which account to use.",
       });
       return;
     }
@@ -227,7 +251,7 @@ export default function NotificationsPage() {
       if (!isPushSupported(OneSignal)) {
         setNotice({
           severity: "error",
-          text: "This browser cannot use web push. Try Chrome, Edge, or Safari in a normal window (not an in-app browser).",
+          text: "This browser can’t receive these alerts. Try opening this page in Safari or Chrome, in a regular tab (not inside another app’s browser).",
         });
         return;
       }
@@ -236,20 +260,18 @@ export default function NotificationsPage() {
       if (perm === "denied") {
         setNotice({
           severity: "warning",
-          text: "Notifications are blocked for this site. Allow them in your browser’s site settings for this page, then try again.",
+          text: "Alerts are turned off for this site. In your browser, open settings for this website and allow notifications, then come back and tap Turn on alerts again.",
         });
         return;
       }
 
-      if (perm !== "granted") {
-        await OneSignal.Notifications.requestPermission();
-      }
+      await OneSignal.Notifications.requestPermission();
 
       perm = browserPermission();
       if (perm !== "granted") {
         setNotice({
           severity: "warning",
-          text: "Permission was not granted. Tap again and choose Allow, or enable notifications in site settings.",
+          text: "We still don’t have permission to send alerts. Tap Turn on alerts again, choose Allow if you see a prompt, or turn on notifications for this site in your browser settings.",
         });
         return;
       }
@@ -258,7 +280,7 @@ export default function NotificationsPage() {
       if (!subId) {
         setNotice({
           severity: "error",
-          text: "We could not finish registering this device for push. Check that this site’s URL is allowed in your OneSignal dashboard, then try again.",
+          text: "We couldn’t finish connecting alerts on this device. Check your internet connection, wait a few seconds, and tap Turn on alerts again.",
         });
         return;
       }
@@ -267,14 +289,14 @@ export default function NotificationsPage() {
       setLinkSuccess(true);
       setNotice({
         severity: "success",
-        text: "This browser is linked for order-ready alerts. If OneSignal ever shows unsubscribed, use this page again with the same steps.",
+        text: "You’re set. We’ll only notify this phone or computer when your order is ready for pickup.",
       });
     } catch (err) {
       console.error(err);
       setLinkSuccess(false);
       setNotice({
         severity: "error",
-        text: err?.message ? String(err.message) : "Something went wrong. Please try again.",
+        text: "Something went wrong while turning on alerts. Please try again in a moment.",
       });
     } finally {
       setLoading(false);
@@ -317,18 +339,18 @@ export default function NotificationsPage() {
             </Box>
 
             <Typography variant="h5" fontWeight={800} letterSpacing="-0.02em">
-              Turn on order updates
+              Order ready alerts
             </Typography>
-            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 400 }}>
-              PumpGo only uses notifications for <strong>order-ready updates</strong> on this device. Your account is
-              tied to the <strong>user_id</strong> in this page’s link — not marketing email.
+            <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 420 }}>
+              Get a short ping when your PumpGo order is <strong>ready to pick up</strong>. We won’t use this for ads
+              or spam—only your order status.
             </Typography>
 
             <List dense sx={{ width: "100%", textAlign: "left", py: 0 }}>
               {[
-                "Open this page with ?user_id=… (from your app link).",
-                "Tap Continue, then Allow notifications when Chrome asks (two deliberate taps help avoid spam filters).",
-                "We link this browser to that id for order alerts only. You can turn them off in site settings anytime.",
+                "Open this page using the link from the PumpGo app (that way we know it’s you).",
+                "Tap Get started, then Turn on alerts. If your phone or browser asks, choose Allow.",
+                "You can turn alerts off anytime in your browser’s settings for this website.",
               ].map((text, i) => (
                 <ListItem key={i} disableGutters sx={{ alignItems: "flex-start", py: 0.5 }}>
                   <ListItemIcon sx={{ minWidth: 36, mt: 0.25 }}>
@@ -354,11 +376,11 @@ export default function NotificationsPage() {
               ))}
             </List>
 
-            {userId && (
-              <Typography variant="caption" color="text.secondary" sx={{ alignSelf: "stretch", textAlign: "left" }}>
-                Current <strong>user_id</strong>: <Box component="code">{userId}</Box>
+            {userId ? (
+              <Typography variant="caption" color="success.main" sx={{ alignSelf: "stretch", textAlign: "left", fontWeight: 600 }}>
+                Your app link is valid — you can continue below.
               </Typography>
-            )}
+            ) : null}
 
             {notice.severity && notice.text && (
               <Alert severity={notice.severity} sx={{ width: "100%", textAlign: "left" }}>
@@ -379,13 +401,13 @@ export default function NotificationsPage() {
                   setNotice({
                     severity: "info",
                     text: already
-                      ? "Next: tap the green button to sync this device with PumpGo again (re-subscribe in OneSignal)."
-                      : "Next: tap the green button. Your browser will ask permission — choose Allow for order-ready alerts.",
+                      ? "Good — notifications are already allowed here. Tap Turn on alerts to refresh this device if alerts stopped working."
+                      : "Almost there — tap Turn on alerts. If a box appears, choose Allow so we can send order-ready messages.",
                   });
                 }}
                 sx={{ py: 1.25, fontWeight: 700, borderRadius: 2, borderWidth: 2, "&:hover": { borderWidth: 2 } }}
               >
-                {intentReady ? "Step 1 done ✓" : "Continue — I want order-ready alerts"}
+                {intentReady ? "You’re ready for the next step ✓" : "Get started"}
               </Button>
 
               <Button
@@ -399,19 +421,18 @@ export default function NotificationsPage() {
                 {loading ? (
                   <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="center">
                     <CircularProgress size={22} color="inherit" />
-                    <span>Working…</span>
+                    <span>One moment…</span>
                   </Stack>
                 ) : linkSuccess ? (
-                  "Reconnect subscription (same browser)"
+                  "Turn on alerts again"
                 ) : (
-                  "Allow notifications in this browser"
+                  "Turn on alerts"
                 )}
               </Button>
             </Stack>
 
-            <Typography variant="caption" color="text.secondary" sx={{ pt: 0.5 }}>
-              If Chrome shows a quieter prompt, open the lock icon beside the address bar → Site settings → Notifications
-              → Allow.
+            <Typography variant="caption" color="text.secondary" sx={{ pt: 0.5, maxWidth: 400 }}>
+              Don’t see a popup? Open your browser’s settings for this website, find Notifications, and choose Allow.
             </Typography>
           </Stack>
         </Box>
