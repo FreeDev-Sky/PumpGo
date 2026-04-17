@@ -137,6 +137,30 @@ async function optInToPushIfAvailable(OneSignal) {
   }
 }
 
+function sleep(ms) {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+/**
+ * Re-subscribe after OneSignal opted the user out while the browser may still show permission "granted".
+ * Retries optIn + wait once if the first wait times out without an id.
+ */
+async function ensureActivePushSubscription(OneSignal) {
+  await optInToPushIfAvailable(OneSignal);
+  let id = await waitForSubscriptionId(OneSignal, 22000);
+  if (!id) {
+    await sleep(500);
+    await optInToPushIfAvailable(OneSignal);
+    id = await waitForSubscriptionId(OneSignal, 14000);
+  }
+  if (!id) {
+    await sleep(500);
+    await optInToPushIfAvailable(OneSignal);
+    id = await waitForSubscriptionId(OneSignal, 10000);
+  }
+  return id;
+}
+
 export default function NotificationsPage() {
   const [searchParams] = useSearchParams();
   /** `user_id` from ?user_id=… (same as the old HTML page). */
@@ -144,7 +168,8 @@ export default function NotificationsPage() {
 
   const [notice, setNotice] = useState({ severity: null, text: "" });
   const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
+  /** Last run linked push + external id; never blocks re-runs (user may need to heal OneSignal opt-out). */
+  const [linkSuccess, setLinkSuccess] = useState(false);
   /** Chrome (and others) penalize instant permission prompts; require an explicit intent tap first. */
   const [intentReady, setIntentReady] = useState(false);
 
@@ -154,10 +179,16 @@ export default function NotificationsPage() {
 
   useEffect(() => {
     setIntentReady(false);
+    setLinkSuccess(false);
     if (!userId) {
       setNotice({
         severity: "warning",
         text: "This page needs ?user_id=… in the URL. Open it from your app or add your id after user_id=.",
+      });
+    } else if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+      setNotice({
+        severity: "info",
+        text: "This site already has notification permission. If PumpGo shows you as unsubscribed, tap Continue then the green button to connect again.",
       });
     } else {
       setNotice({ severity: null, text: "" });
@@ -223,13 +254,7 @@ export default function NotificationsPage() {
         return;
       }
 
-      try {
-        await optInToPushIfAvailable(OneSignal);
-      } catch (e) {
-        console.warn("OneSignal optIn", e);
-      }
-
-      const subId = await waitForSubscriptionId(OneSignal, 25000);
+      const subId = await ensureActivePushSubscription(OneSignal);
       if (!subId) {
         setNotice({
           severity: "error",
@@ -239,13 +264,14 @@ export default function NotificationsPage() {
       }
 
       await loginExternalUser(OneSignal, userId);
-      setDone(true);
+      setLinkSuccess(true);
       setNotice({
         severity: "success",
-        text: "This browser is set up. We’ll send order-ready alerts here.",
+        text: "This browser is linked for order-ready alerts. If OneSignal ever shows unsubscribed, use this page again with the same steps.",
       });
     } catch (err) {
       console.error(err);
+      setLinkSuccess(false);
       setNotice({
         severity: "error",
         text: err?.message ? String(err.message) : "Something went wrong. Please try again.",
@@ -346,12 +372,15 @@ export default function NotificationsPage() {
                 color="primary"
                 size="large"
                 fullWidth
-                disabled={loading || done || !userId || intentReady}
+                disabled={loading || !userId || intentReady}
                 onClick={() => {
                   setIntentReady(true);
+                  const already = typeof Notification !== "undefined" && Notification.permission === "granted";
                   setNotice({
                     severity: "info",
-                    text: "Next: tap the green button. Chrome will ask permission — choose Allow if you want order-ready alerts.",
+                    text: already
+                      ? "Next: tap the green button to sync this device with PumpGo again (re-subscribe in OneSignal)."
+                      : "Next: tap the green button. Your browser will ask permission — choose Allow for order-ready alerts.",
                   });
                 }}
                 sx={{ py: 1.25, fontWeight: 700, borderRadius: 2, borderWidth: 2, "&:hover": { borderWidth: 2 } }}
@@ -363,7 +392,7 @@ export default function NotificationsPage() {
                 variant="contained"
                 size="large"
                 fullWidth
-                disabled={loading || done || !userId || !intentReady}
+                disabled={loading || !userId || !intentReady}
                 onClick={runSubscribe}
                 sx={{ py: 1.5, fontWeight: 700, borderRadius: 2 }}
               >
@@ -372,8 +401,8 @@ export default function NotificationsPage() {
                     <CircularProgress size={22} color="inherit" />
                     <span>Working…</span>
                   </Stack>
-                ) : done ? (
-                  "Notifications on"
+                ) : linkSuccess ? (
+                  "Reconnect subscription (same browser)"
                 ) : (
                   "Allow notifications in this browser"
                 )}
