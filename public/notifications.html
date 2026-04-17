@@ -8,9 +8,8 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
 
-  <!-- OneSignal v16: must use defer + OneSignalDeferred (not window.OneSignal) -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 
   <style>
@@ -31,19 +30,14 @@
       --shadow: 0 4px 24px rgba(19, 78, 74, 0.08), 0 1px 3px rgba(19, 78, 74, 0.06);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       min-height: 100dvh;
-      font-family: "DM Sans", system-ui, -apple-system, sans-serif;
-      font-optical-sizing: auto;
+      font-family: "DM Sans", system-ui, sans-serif;
       color: var(--text);
-      background:
-        radial-gradient(1200px 600px at 50% -10%, var(--bg-accent), var(--bg)),
-        var(--bg);
+      background: radial-gradient(1200px 600px at 50% -10%, var(--bg-accent), var(--bg)), var(--bg);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -51,10 +45,7 @@
       line-height: 1.5;
     }
 
-    .shell {
-      width: 100%;
-      max-width: 420px;
-    }
+    .shell { width: 100%; max-width: 420px; }
 
     .card {
       background: var(--card);
@@ -76,29 +67,24 @@
       color: var(--brand);
     }
 
-    .mark svg {
-      width: 28px;
-      height: 28px;
-    }
+    .mark svg { width: 28px; height: 28px; }
 
     h1 {
       font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: -0.02em;
       margin: 0 0 8px;
-      color: var(--text);
     }
 
     .lede {
-      margin: 0 0 24px;
+      margin: 0 0 20px;
       font-size: 1rem;
       color: var(--text-muted);
-      font-weight: 400;
     }
 
     .steps {
       text-align: left;
-      margin: 0 0 24px;
+      margin: 0 0 20px;
       padding: 0;
       list-style: none;
       font-size: 0.9rem;
@@ -109,12 +95,10 @@
       display: flex;
       gap: 12px;
       align-items: flex-start;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
     }
 
-    .steps li:last-child {
-      margin-bottom: 0;
-    }
+    .steps li:last-child { margin-bottom: 0; }
 
     .step-num {
       flex-shrink: 0;
@@ -130,10 +114,7 @@
       justify-content: center;
     }
 
-    .steps strong {
-      color: var(--text);
-      font-weight: 600;
-    }
+    .steps strong { color: var(--text); font-weight: 600; }
 
     .notice {
       display: none;
@@ -145,27 +126,10 @@
       line-height: 1.45;
     }
 
-    .notice.is-visible {
-      display: block;
-    }
-
-    .notice--warn {
-      background: #fffbeb;
-      color: #92400e;
-      border: 1px solid #fde68a;
-    }
-
-    .notice--error {
-      background: var(--danger-bg);
-      color: var(--danger);
-      border: 1px solid #fecaca;
-    }
-
-    .notice--ok {
-      background: var(--success-bg);
-      color: var(--success);
-      border: 1px solid #a7f3d0;
-    }
+    .notice.is-visible { display: block; }
+    .notice--warn { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+    .notice--error { background: var(--danger-bg); color: var(--danger); border: 1px solid #fecaca; }
+    .notice--ok { background: var(--success-bg); color: var(--success); border: 1px solid #a7f3d0; }
 
     .cta {
       width: 100%;
@@ -185,10 +149,6 @@
     .cta:hover:not(:disabled) {
       transform: translateY(-1px);
       box-shadow: 0 4px 16px rgba(13, 148, 136, 0.4);
-    }
-
-    .cta:active:not(:disabled) {
-      transform: translateY(0);
     }
 
     .cta:focus-visible {
@@ -219,23 +179,14 @@
       display: none;
     }
 
-    .cta.is-loading .spinner {
-      display: block;
-    }
+    .cta.is-loading .spinner { display: block; }
 
-    .cta.is-loading .cta-label {
-      opacity: 0.9;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .fineprint {
-      margin: 20px 0 0;
+      margin: 18px 0 0;
       font-size: 0.8125rem;
       color: var(--text-muted);
-      line-height: 1.5;
     }
 
     footer {
@@ -247,9 +198,7 @@
     }
   </style>
 </head>
-
 <body>
-
   <div class="shell">
     <main class="card" aria-labelledby="title">
       <div class="mark" aria-hidden="true">
@@ -259,20 +208,20 @@
       </div>
 
       <h1 id="title">Turn on order updates</h1>
-      <p class="lede">Get a push notification as soon as your PumpGo order is ready—no need to keep checking the app.</p>
+      <p class="lede">Get a push when your PumpGo order is ready. Use the link from your app so we know your account.</p>
 
-      <ul class="steps" aria-label="What happens next">
+      <ul class="steps" aria-label="Steps">
         <li>
           <span class="step-num" aria-hidden="true">1</span>
-          <span><strong>Tap the button</strong> below—we’ll connect this device to your account.</span>
+          <span>Open this page with <strong>?user_id=…</strong> in the address bar (from your app).</span>
         </li>
         <li>
           <span class="step-num" aria-hidden="true">2</span>
-          <span>When your browser asks, choose <strong>Allow</strong> for notifications.</span>
+          <span>Tap <strong>Enable</strong> and choose <strong>Allow</strong> when the browser asks.</span>
         </li>
         <li>
           <span class="step-num" aria-hidden="true">3</span>
-          <span>You’re set. We’ll only use this to send <strong>order-ready alerts</strong>.</span>
+          <span>We link this device to your id so only <strong>your</strong> orders notify here.</span>
         </li>
       </ul>
 
@@ -285,238 +234,251 @@
         </span>
       </button>
 
-      <p class="fineprint">Uses your browser’s notification permission. You can turn it off anytime in your browser settings.</p>
+      <p class="fineprint">You can turn off notifications anytime in your browser settings for this site.</p>
     </main>
     <footer>PumpGo</footer>
   </div>
 
   <script>
-    const ONESIGNAL_APP_ID = "75b1e381-313b-4536-a06f-386d7b82f236";
+    (function () {
+      const ONESIGNAL_APP_ID = "75b1e381-313b-4536-a06f-386d7b82f236";
+      const SW_PATH = "/OneSignalSDKWorker.js";
 
-    const noticeEl = document.getElementById("notice");
-    const btn = document.getElementById("subscribe-btn");
+      const noticeEl = document.getElementById("notice");
+      const btn = document.getElementById("subscribe-btn");
+      const labelEl = btn.querySelector(".cta-label");
 
-    let oneSignalInitPromise = null;
-    let permissionListenerAttached = false;
-    let externalIdLinked = false;
+      /** @type {Promise<any> | null} */
+      let initPromise = null;
+      let busy = false;
 
-    function getUserIdFromUrl() {
-      const raw = new URLSearchParams(location.search).get("user_id");
-      if (raw == null || String(raw).trim() === "") return null;
-      return String(raw).trim();
-    }
-
-    function setNotice(type, message) {
-      noticeEl.className = "notice is-visible";
-      if (type === "warn") noticeEl.classList.add("notice--warn");
-      else if (type === "error") noticeEl.classList.add("notice--error");
-      else if (type === "ok") noticeEl.classList.add("notice--ok");
-      noticeEl.textContent = message;
-    }
-
-    function clearNotice() {
-      noticeEl.className = "notice";
-      noticeEl.textContent = "";
-    }
-
-    function setLoading(loading) {
-      btn.disabled = loading;
-      btn.classList.toggle("is-loading", loading);
-    }
-
-    function markButtonEnabledState() {
-      btn.querySelector(".cta-label").textContent = "Notifications on";
-      btn.disabled = true;
-    }
-
-    function checkSetupFromUrl() {
-      const userId = getUserIdFromUrl();
-      if (!userId) {
-        setNotice("warn", "This link should include your user id (e.g. ?user_id=… from Glide). Ask for the full link or open it from the app.");
-        return;
-      }
-      clearNotice();
-    }
-
-    function hasGrantedPermission(OneSignal) {
-      const browserGranted = typeof Notification !== "undefined" && Notification.permission === "granted";
-      const osPerm = OneSignal?.Notifications?.permission;
-      const osGranted = osPerm === true || osPerm === "granted";
-      return browserGranted || osGranted;
-    }
-
-    async function ensureOneSignalInitialized() {
-      if (oneSignalInitPromise) return oneSignalInitPromise;
-
-      oneSignalInitPromise = new Promise((resolve, reject) => {
-        window.OneSignalDeferred = window.OneSignalDeferred || [];
-        window.OneSignalDeferred.push(async function (OneSignal) {
-          try {
-            const isLocal =
-              location.hostname === "localhost" ||
-              location.hostname === "127.0.0.1";
-
-            await OneSignal.init({
-              appId: ONESIGNAL_APP_ID,
-              serviceWorkerPath: "OneSignalSDKWorker.js",
-              autoResubscribe: true,
-              allowLocalhostAsSecureOrigin: isLocal
-            });
-
-            if (!permissionListenerAttached) {
-              permissionListenerAttached = true;
-              OneSignal.Notifications.addEventListener("permissionChange", async function (granted) {
-                if (!(granted === true || granted === "granted" || Notification.permission === "granted")) return;
-                try {
-                  await finalizeSubscriptionSuccess(OneSignal);
-                } catch (err) {
-                  console.error(err);
-                }
-              });
-            }
-
-            resolve(OneSignal);
-          } catch (err) {
-            reject(err);
-          }
+      function sleep(ms) {
+        return new Promise(function (r) {
+          setTimeout(r, ms);
         });
-      });
-
-      return oneSignalInitPromise;
-    }
-
-    function waitForSubscriptionId(OneSignal, timeoutMs) {
-      return new Promise((resolve, reject) => {
-        const existing = OneSignal.User.PushSubscription.id;
-        if (existing) {
-          resolve(existing);
-          return;
-        }
-        const timer = setTimeout(() => {
-          const lateId = OneSignal.User.PushSubscription.id;
-          if (lateId) {
-            OneSignal.User.PushSubscription.removeEventListener("change", onChange);
-            resolve(lateId);
-            return;
-          }
-          OneSignal.User.PushSubscription.removeEventListener("change", onChange);
-          reject(new Error("We couldn’t finish linking this device. Allow notifications and try again, or check that this site’s URL is allowed in your OneSignal dashboard."));
-        }, timeoutMs);
-        function onChange(event) {
-          if (event.current && event.current.id) {
-            clearTimeout(timer);
-            OneSignal.User.PushSubscription.removeEventListener("change", onChange);
-            resolve(event.current.id);
-          }
-        }
-        OneSignal.User.PushSubscription.addEventListener("change", onChange);
-      });
-    }
-
-    async function resolveSubscriptionId(OneSignal) {
-      const immediate = OneSignal.User.PushSubscription.id;
-      if (immediate) return immediate;
-
-      try {
-        const waited = await waitForSubscriptionId(OneSignal, 12000);
-        if (waited) return waited;
-      } catch (_) {
-        // fall through to timed polling fallback
       }
 
-      const maxAttempts = 12;
-      for (let i = 0; i < maxAttempts; i += 1) {
-        await new Promise((r) => setTimeout(r, 500));
-        const id = OneSignal.User.PushSubscription.id;
-        if (id) return id;
-      }
-      return null;
-    }
-
-    async function linkExternalId(OneSignal, externalId) {
-      if (!externalId) return;
-      try {
-        await OneSignal.login(externalId);
-      } catch (e) {
-        // Switching identities in the same browser can trigger 409 conflicts.
-        const message = String(e && (e.message || e));
-        if (message.includes("409") || message.toLowerCase().includes("conflict")) {
-          try {
-            await OneSignal.logout();
-            await OneSignal.login(externalId);
-          } catch (retryErr) {
-            throw retryErr;
-          }
-        } else {
-          throw e;
-        }
-      }
-    }
-
-    async function finalizeSubscriptionSuccess(OneSignal) {
-      const playerId = await resolveSubscriptionId(OneSignal);
-      if (!playerId) {
-        setNotice("error", "Notifications weren’t fully enabled. Tap again and choose Allow when prompted.");
-        return false;
+      function getExternalId() {
+        var raw = new URLSearchParams(location.search).get("user_id");
+        if (raw == null) return null;
+        var t = String(raw).trim();
+        return t === "" ? null : t;
       }
 
-      const externalId = getUserIdFromUrl();
-      if (externalId && !externalIdLinked) {
+      function setNotice(type, message) {
+        noticeEl.className = "notice is-visible notice--" + type;
+        noticeEl.textContent = message;
+      }
+
+      function clearNotice() {
+        noticeEl.className = "notice";
+        noticeEl.textContent = "";
+      }
+
+      function setLoading(on) {
+        btn.disabled = on;
+        btn.classList.toggle("is-loading", on);
+      }
+
+      function markDone() {
+        labelEl.textContent = "Notifications on";
+        btn.disabled = true;
+        setNotice("ok", "This browser is set up. We’ll send order-ready alerts here.");
+      }
+
+      function browserPermission() {
+        if (typeof Notification === "undefined") return "unsupported";
+        return Notification.permission;
+      }
+
+      function isPushSupported(OneSignal) {
         try {
-          await linkExternalId(OneSignal, externalId);
-          externalIdLinked = true;
-        } catch (e) {
-          console.warn("OneSignal.login (user_id from URL)", e);
-          setNotice("warn", "Notification permission is enabled, but account linking had a conflict. Tap Enable once more to re-link this browser.");
+          return OneSignal.Notifications && OneSignal.Notifications.isPushSupported() === true;
+        } catch (_) {
           return false;
         }
       }
 
-      setNotice("ok", "You’re all set. We’ll notify this device when your order is ready.");
-      markButtonEnabledState();
-      return true;
-    }
-
-    checkSetupFromUrl();
-
-    btn.addEventListener("click", async () => {
-      clearNotice();
-      const userId = getUserIdFromUrl();
-
-      if (!userId) {
-        setNotice("warn", "Missing user id in the link. Open this page from Glide with ?user_id=… so we know who to notify.");
-        return;
+      function subscriptionId(OneSignal) {
+        try {
+          return OneSignal.User && OneSignal.User.PushSubscription && OneSignal.User.PushSubscription.id;
+        } catch (_) {
+          return null;
+        }
       }
 
-      setLoading(true);
-      try {
-        const OneSignal = await ensureOneSignalInitialized();
+      /**
+       * OneSignal loads asynchronously. Init only once, on first user action.
+       */
+      function initOneSignalOnce() {
+        if (initPromise) return initPromise;
 
-        if (!OneSignal.Notifications.isPushSupported()) {
-          setNotice("error", "This browser can’t use web push. Try Chrome, Edge, or Safari in a normal tab—not an in-app browser.");
-          return;
-        }
+        initPromise = new Promise(function (resolve, reject) {
+          window.OneSignalDeferred = window.OneSignalDeferred || [];
+          window.OneSignalDeferred.push(async function (OneSignal) {
+            try {
+              var local =
+                location.hostname === "localhost" ||
+                location.hostname === "127.0.0.1";
 
-        if (hasGrantedPermission(OneSignal)) {
-          await finalizeSubscriptionSuccess(OneSignal);
-          return;
-        }
+              await OneSignal.init({
+                appId: ONESIGNAL_APP_ID,
+                serviceWorkerPath: SW_PATH,
+                autoResubscribe: true,
+                allowLocalhostAsSecureOrigin: local,
+              });
 
-        await OneSignal.Notifications.requestPermission();
-        if (hasGrantedPermission(OneSignal)) {
-          await finalizeSubscriptionSuccess(OneSignal);
-          return;
-        }
-        setNotice("warn", "Notifications are still blocked. Choose Allow in the browser prompt or site settings, then try again.");
-      } catch (err) {
-        console.error(err);
-        setNotice("error", err && err.message ? err.message : "Something went wrong. Please try again.");
-      } finally {
-        setLoading(false);
+              resolve(OneSignal);
+            } catch (err) {
+              reject(err);
+            }
+          });
+        });
+
+        return initPromise;
       }
-    });
+
+      /**
+       * After permission is granted, wait until OneSignal exposes a push subscription id.
+       */
+      function waitForSubscriptionId(OneSignal, timeoutMs) {
+        var existing = subscriptionId(OneSignal);
+        if (existing) return Promise.resolve(existing);
+
+        return new Promise(function (resolve) {
+          var settled = false;
+
+          function finish(id) {
+            if (settled) return;
+            settled = true;
+            clearInterval(poll);
+            clearTimeout(timer);
+            try {
+              OneSignal.User.PushSubscription.removeEventListener("change", onChange);
+            } catch (_) {}
+            resolve(id || null);
+          }
+
+          function onChange() {
+            var id = subscriptionId(OneSignal);
+            if (id) finish(id);
+          }
+
+          try {
+            OneSignal.User.PushSubscription.addEventListener("change", onChange);
+          } catch (_) {}
+
+          var poll = setInterval(function () {
+            var id = subscriptionId(OneSignal);
+            if (id) finish(id);
+          }, 250);
+
+          var timer = setTimeout(function () {
+            finish(subscriptionId(OneSignal));
+          }, timeoutMs);
+        });
+      }
+
+      async function loginExternalUser(OneSignal, externalId) {
+        try {
+          await OneSignal.login(externalId);
+        } catch (e) {
+          var msg = String((e && e.message) || e || "");
+          if (/409|conflict/i.test(msg)) {
+            await OneSignal.logout();
+            await OneSignal.login(externalId);
+            return;
+          }
+          throw e;
+        }
+      }
+
+      /**
+       * Single linear path: init → support check → permission → subscription id → login(external id).
+       */
+      async function runSubscribeFlow() {
+        var externalId = getExternalId();
+        if (!externalId) {
+          setNotice(
+            "warn",
+            "Add your user id to the URL, for example: ?user_id=YOUR_ID (use the link from the app)."
+          );
+          return;
+        }
+
+        if (busy) return;
+        busy = true;
+        clearNotice();
+        setLoading(true);
+
+        try {
+          var OneSignal = await initOneSignalOnce();
+
+          if (!isPushSupported(OneSignal)) {
+            setNotice(
+              "error",
+              "This browser cannot use web push. Try Chrome, Edge, or Safari in a normal window (not an in-app browser)."
+            );
+            return;
+          }
+
+          var perm = browserPermission();
+          if (perm === "denied") {
+            setNotice(
+              "warn",
+              "Notifications are blocked for this site. Open your browser settings for this site and allow notifications, then tap Enable again."
+            );
+            return;
+          }
+
+          if (perm !== "granted") {
+            await OneSignal.Notifications.requestPermission();
+          }
+
+          perm = browserPermission();
+          if (perm !== "granted") {
+            setNotice(
+              "warn",
+              "Permission was not granted. Tap Enable again and choose Allow, or allow notifications in site settings."
+            );
+            return;
+          }
+
+          var subId = await waitForSubscriptionId(OneSignal, 20000);
+          if (!subId) {
+            setNotice(
+              "error",
+              "We could not finish registering this device for push. Check that this site’s URL is allowed in your OneSignal dashboard, then try again."
+            );
+            return;
+          }
+
+          await loginExternalUser(OneSignal, externalId);
+          markDone();
+        } catch (err) {
+          console.error(err);
+          var m = err && err.message ? String(err.message) : "Something went wrong. Please try again.";
+          setNotice("error", m);
+        } finally {
+          busy = false;
+          setLoading(false);
+        }
+      }
+
+      btn.addEventListener("click", function () {
+        runSubscribeFlow();
+      });
+
+      /* If the page is opened with permission already granted, one tap still runs the full link step. */
+      (function bootUrlHint() {
+        if (!getExternalId()) {
+          setNotice(
+            "warn",
+            "This page needs ?user_id=… in the URL. Open it from your app or paste your id after user_id=."
+          );
+        }
+      })();
+    })();
   </script>
-
 </body>
 </html>
-

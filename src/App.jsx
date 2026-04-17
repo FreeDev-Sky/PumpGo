@@ -10,9 +10,6 @@ const PUMPGO_CUSTOMER_APP_URL = "https://customer.pumpgo.app";
 
 const CONTENT_MAX_WIDTH = 980;
 
-const qrImageForUrl = (url) =>
-  `https://api.qrserver.com/v1/create-qr-code/?size=520x520&data=${encodeURIComponent(url)}`;
-
 const categoryTiles = [
   { id: "snacks", src: "/assets/categories/snacks.png", alt: "Snacks" },
   { id: "tobacco", src: "/assets/categories/tobacco.png", alt: "Tobacco — ID required at pickup" },
@@ -43,31 +40,12 @@ function CustomerQrBlock() {
         boxShadow: "0 8px 28px rgba(15, 23, 42, 0.1)",
       }}
     >
-      <Box sx={{ position: "relative", p: { xs: 1, sm: 1.5 } }}>
+      <Box sx={{ p: { xs: 1, sm: 1.5 } }}>
         <Box
           component="img"
-          src={qrImageForUrl(PUMPGO_CUSTOMER_APP_URL)}
+          src="/assets/customer-qr.png"
           alt="Scan to order"
           sx={{ display: "block", width: "100%", height: "auto" }}
-        />
-        <Box
-          component="img"
-          src="/assets/logo.png"
-          alt=""
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: { xs: 40, sm: 48, md: 56 },
-            height: { xs: 40, sm: 48, md: 56 },
-            borderRadius: 2,
-            border: "3px solid #fff",
-            boxShadow: `0 4px 14px ${alpha("#000", 0.15)}`,
-            objectFit: "cover",
-            bgcolor: "#fff",
-            display: "block",
-          }}
         />
       </Box>
       <Box
