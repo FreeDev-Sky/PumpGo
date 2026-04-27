@@ -11,18 +11,39 @@ const PUMPGO_CUSTOMER_APP_URL = "https://customer.pumpgo.app";
 const CONTENT_MAX_WIDTH = 980;
 
 const categoryTiles = [
-  { id: "snacks", src: "/assets/categories/snacks.png", alt: "Snacks" },
-  { id: "tobacco", src: "/assets/categories/tobacco.png", alt: "Tobacco — ID required at pickup" },
-  { id: "kitchen", src: "/assets/categories/kitchen.png", alt: "Kitchen — fresh, made to order" },
-  { id: "drinks", src: "/assets/categories/drinks.png", alt: "Drinks" },
-  { id: "meds", src: "/assets/categories/meds.png", alt: "Meds — pain relief, cold and allergy" },
-  { id: "alcohol", src: "/assets/categories/alcohol.png", alt: "Alcohol — ID required at pickup" },
+  { id: "snacks", title: "Snacks", src: "/assets/categories/snacks.png", alt: "Snacks" },
+  { id: "tobacco", title: "Tobacco", src: "/assets/categories/tobacco.png", alt: "Tobacco — ID required at pickup" },
+  { id: "kitchen", title: "Kitchen", src: "/assets/categories/kitchen.png", alt: "Kitchen — fresh, made to order" },
+  { id: "drinks", title: "Drinks", src: "/assets/categories/drinks.png", alt: "Drinks" },
+  { id: "meds", title: "Meds", src: "/assets/categories/meds.png", alt: "Meds — pain relief, cold and allergy" },
+  { id: "alcohol", title: "Alcohol", src: "/assets/categories/alcohol.png", alt: "Alcohol — ID required at pickup" },
 ];
 
-function CategoryCard({ src, alt }) {
+function CategoryCard({ src, alt, title }) {
   return (
-    <Box sx={{ borderRadius: 2, overflow: "hidden", lineHeight: 0 }}>
+    <Box sx={{ borderRadius: 2, overflow: "hidden", lineHeight: 0, bgcolor: alpha("#020617", 0.3) }}>
       <Box component="img" src={src} alt={alt} sx={{ width: "100%", height: "auto", display: "block" }} />
+      <Box
+        sx={{
+          py: 0.7,
+          px: 1,
+          textAlign: "center",
+          bgcolor: alpha("#020617", 0.72),
+          borderTop: `1px solid ${alpha("#fff", 0.1)}`,
+        }}
+      >
+        <Typography
+          sx={{
+            color: "#fff",
+            fontWeight: 700,
+            fontSize: { xs: "0.75rem", sm: "0.82rem", md: "0.86rem" },
+            letterSpacing: 0.25,
+            lineHeight: 1.2,
+          }}
+        >
+          {title}
+        </Typography>
+      </Box>
     </Box>
   );
 }
@@ -166,9 +187,9 @@ function App() {
         <Grid container spacing={2} sx={{ display: { xs: "none", md: "flex" }, width: "100%", m: 0, alignItems: "stretch" }}>
           <Grid size={3} sx={{ display: "flex", minWidth: 0 }}>
             <Stack spacing={2} sx={{ width: "100%", justifyContent: "space-between" }}>
-              <CategoryCard src={snacks.src} alt={snacks.alt} />
-              <CategoryCard src={tobacco.src} alt={tobacco.alt} />
-              <CategoryCard src={kitchen.src} alt={kitchen.alt} />
+              <CategoryCard src={snacks.src} alt={snacks.alt} title={snacks.title} />
+              <CategoryCard src={tobacco.src} alt={tobacco.alt} title={tobacco.title} />
+              <CategoryCard src={kitchen.src} alt={kitchen.alt} title={kitchen.title} />
             </Stack>
           </Grid>
           <Grid size={6} sx={{ display: "flex", alignItems: "center", justifyContent: "center", minWidth: 0 }}>
@@ -176,9 +197,9 @@ function App() {
           </Grid>
           <Grid size={3} sx={{ display: "flex", minWidth: 0 }}>
             <Stack spacing={2} sx={{ width: "100%", justifyContent: "space-between" }}>
-              <CategoryCard src={drinks.src} alt={drinks.alt} />
-              <CategoryCard src={meds.src} alt={meds.alt} />
-              <CategoryCard src={alcohol.src} alt={alcohol.alt} />
+              <CategoryCard src={drinks.src} alt={drinks.alt} title={drinks.title} />
+              <CategoryCard src={meds.src} alt={meds.alt} title={meds.title} />
+              <CategoryCard src={alcohol.src} alt={alcohol.alt} title={alcohol.title} />
             </Stack>
           </Grid>
         </Grid>
@@ -188,7 +209,7 @@ function App() {
           <Grid container spacing={1.5} sx={{ width: "100%", m: 0 }}>
             {categoryTiles.map((c) => (
               <Grid key={c.id} size={4} sx={{ minWidth: 0 }}>
-                <CategoryCard src={c.src} alt={c.alt} />
+                <CategoryCard src={c.src} alt={c.alt} title={c.title} />
               </Grid>
             ))}
           </Grid>
@@ -201,7 +222,7 @@ function App() {
           <Grid container spacing={1} sx={{ width: "100%", m: 0 }}>
             {categoryTiles.map((c) => (
               <Grid key={c.id} size={6} sx={{ minWidth: 0 }}>
-                <CategoryCard src={c.src} alt={c.alt} />
+                <CategoryCard src={c.src} alt={c.alt} title={c.title} />
               </Grid>
             ))}
           </Grid>
