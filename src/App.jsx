@@ -13,6 +13,7 @@ const DEMO_VIDEOS = [
   { id: "create-account", title: "Create Customer Account Demo", url: "https://app.arcade.software/share/mkkhtAUj4vbWpaMsFUGe" },
   { id: "full-workflow", title: "Full PumpGo App workflow", url: "https://app.arcade.software/share/hZcjCfh1cxdr3m4jqhNr" },
   { id: "notifications", title: "Enable notifications setting", url: "https://app.arcade.software/share/XGVtrugT9HkT44eHzgVZ" },
+  { id: "station-side", title: "Station-side app demo", url: "https://app.arcade.software/share/8fneAXN3L1FzsaxvrgAW" },
 ];
 
 const CONTENT_MAX_WIDTH = 980;
