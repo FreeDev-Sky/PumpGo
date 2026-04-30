@@ -1,4 +1,6 @@
-import { Box, Grid, Stack, Typography, alpha } from "@mui/material";
+import { useState } from "react";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Grid, IconButton, Stack, Typography, alpha } from "@mui/material";
+import SmartDisplayOutlinedIcon from "@mui/icons-material/SmartDisplayOutlined";
 
 const HEADER_LOGO_SRC = "/assets/pumpgo-header-logo.png";
 const HERO_BANNER_SRC = "/assets/hero-skip-the-line.png";
@@ -7,6 +9,11 @@ const LANDING_BG_DESKTOP_SRC = "/assets/landing-hero-bg.png";
 const LANDING_BG_MOBILE_SRC = "/assets/landing-night-bg.png";
 
 const PUMPGO_CUSTOMER_APP_URL = "https://customer.pumpgo.app";
+const DEMO_VIDEOS = [
+  { id: "create-account", title: "Create Customer Account Demo", url: "https://app.arcade.software/share/mkkhtAUj4vbWpaMsFUGe" },
+  { id: "full-workflow", title: "Full PumpGo App workflow", url: "https://app.arcade.software/share/hZcjCfh1cxdr3m4jqhNr" },
+  { id: "notifications", title: "Enable notifications setting", url: "https://app.arcade.software/share/XGVtrugT9HkT44eHzgVZ" },
+];
 
 const CONTENT_MAX_WIDTH = 980;
 
@@ -94,6 +101,7 @@ function CustomerQrBlock() {
 
 function App() {
   const [snacks, tobacco, kitchen, drinks, meds, alcohol] = categoryTiles;
+  const [isDemoOpen, setIsDemoOpen] = useState(false);
 
   return (
     <Box
@@ -126,6 +134,21 @@ function App() {
           bgcolor: "transparent",
         }}
       >
+      <Box sx={{ display: "flex", justifyContent: "flex-end", pt: { xs: 1, sm: 1.5 }, px: { xs: 1, sm: 1.5 } }}>
+        <IconButton
+          aria-label="Open demo video"
+          onClick={() => setIsDemoOpen(true)}
+          sx={{
+            color: "#fff",
+            bgcolor: alpha("#020617", 0.62),
+            border: `1px solid ${alpha("#fff", 0.2)}`,
+            "&:hover": { bgcolor: alpha("#020617", 0.8) },
+          }}
+        >
+          <SmartDisplayOutlinedIcon />
+        </IconButton>
+      </Box>
+
       {/* Header */}
       <Box
         sx={{
@@ -268,6 +291,24 @@ function App() {
           © {new Date().getFullYear()} PumpGo · Convenience at full speed
         </Typography>
       </Box>
+      <Dialog open={isDemoOpen} onClose={() => setIsDemoOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>PumpGo demo videos</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+            Select a demo to watch:
+          </Typography>
+          <Stack spacing={1.25}>
+            {DEMO_VIDEOS.map((demo) => (
+              <Button key={demo.id} href={demo.url} target="_blank" rel="noopener noreferrer" variant="contained" fullWidth>
+                {demo.title}
+              </Button>
+            ))}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setIsDemoOpen(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
       </Box>
     </Box>
   );
